@@ -20,6 +20,12 @@ public class Program {
     public Program() {
     }
 
+    public Program(String name_program, String primary_color, String secondary_color) {
+        this.name_program = name_program;
+        this.primary_color = primary_color;
+        this.secondary_color = secondary_color;
+    }
+
     public Program(String name_program, String primary_color, String secondary_color, int status) {
         this.name_program = name_program;
         this.primary_color = primary_color;

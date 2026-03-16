@@ -1,0 +1,7 @@
+package com.example.plataforma_lealtad_spring_azure.services.interfaces;
+
+import java.util.Map;
+
+public interface IResponseService {
+    public abstract Map<String, Object> generateResponse(boolean status, String message);
+}

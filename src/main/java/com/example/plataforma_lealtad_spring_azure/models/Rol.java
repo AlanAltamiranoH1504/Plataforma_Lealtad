@@ -2,6 +2,7 @@ package com.example.plataforma_lealtad_spring_azure.models;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity()
@@ -9,11 +10,11 @@ import java.util.List;
 public class Rol {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private int id_rol;
     private String name_rol;
     private int status;
     @ManyToMany(mappedBy = "rols") // * Un rol puede pertencer a varios usuarios
-    private List<User> users;
+    private List<User> users = new ArrayList<>();
 
     public Rol() {
     }
@@ -24,11 +25,11 @@ public class Rol {
     }
 
     public int getId() {
-        return id;
+        return id_rol;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setId(int id_rol) {
+        this.id_rol = id_rol;
     }
 
     public String getName_rol() {
