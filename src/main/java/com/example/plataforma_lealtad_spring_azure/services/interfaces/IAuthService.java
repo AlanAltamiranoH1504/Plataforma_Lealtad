@@ -4,4 +4,5 @@ import com.example.plataforma_lealtad_spring_azure.dtos.auth.CreateCustomerAccou
 
 public interface IAuthService {
     public abstract void createAccountCustomer(CreateCustomerAccountDTO createCustomerAccountDTO);
+    public abstract boolean isEmailInUse(String email);
 }

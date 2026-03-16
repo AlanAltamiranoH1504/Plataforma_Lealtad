@@ -1,6 +1,7 @@
 package com.example.plataforma_lealtad_spring_azure.services;
 
 import com.example.plataforma_lealtad_spring_azure.dtos.auth.CreateCustomerAccountDTO;
+import com.example.plataforma_lealtad_spring_azure.exceptions.user.EmailInUseException;
 import com.example.plataforma_lealtad_spring_azure.models.Customer;
 import com.example.plataforma_lealtad_spring_azure.models.Rol;
 import com.example.plataforma_lealtad_spring_azure.models.User;
@@ -28,6 +29,7 @@ public class AuthService implements IAuthService {
     @Override
     public void createAccountCustomer(CreateCustomerAccountDTO createCustomerAccountDTO) {
         // * Create tbl_user
+        this.isEmailInUse(createCustomerAccountDTO.getEmail());
         List<Rol> rolsToAssign = new ArrayList<>();
         for (var rol: createCustomerAccountDTO.getRols()) {
             Optional<Rol> rolToAdd = iRolRespitory.findById(rol);
@@ -62,5 +64,14 @@ public class AuthService implements IAuthService {
                 userToSave
         );
         iCustomerRepository.save(customerToSave);
+    }
+
+    @Override
+    public boolean isEmailInUse(String email) {
+        User emailInUse = iUserRepository.getUserByEmail(email);
+        if (emailInUse != null) {
+            throw new EmailInUseException("Email " + email + " ya se encuentra en uso por otro usuario");
+        }
+        return true;
     }
 }

@@ -2,6 +2,7 @@ package com.example.plataforma_lealtad_spring_azure.exceptions;
 
 import com.example.plataforma_lealtad_spring_azure.exceptions.program.ProgramExistsException;
 import com.example.plataforma_lealtad_spring_azure.exceptions.rol.RolExistsException;
+import com.example.plataforma_lealtad_spring_azure.exceptions.user.EmailInUseException;
 import com.example.plataforma_lealtad_spring_azure.services.interfaces.IResponseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -42,6 +43,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RolExistsException.class)
     public ResponseEntity<?> handleRolExistsException(RolExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                iResponseService.generateResponse(false, ex.getMessage())
+        );
+    }
+
+    @ExceptionHandler(EmailInUseException.class)
+    public ResponseEntity<?> handleEmailInUseException(EmailInUseException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(
                 iResponseService.generateResponse(false, ex.getMessage())
         );
