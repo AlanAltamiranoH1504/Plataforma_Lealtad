@@ -2,6 +2,7 @@ package com.example.plataforma_lealtad_spring_azure.controllers;
 
 import com.example.plataforma_lealtad_spring_azure.dtos.auth.CreateAdminAccountDTO;
 import com.example.plataforma_lealtad_spring_azure.dtos.auth.CreateCustomerAccountDTO;
+import com.example.plataforma_lealtad_spring_azure.dtos.auth.LoginDTO;
 import com.example.plataforma_lealtad_spring_azure.services.interfaces.IAuthService;
 import com.example.plataforma_lealtad_spring_azure.services.interfaces.IResponseService;
 import jakarta.validation.Valid;
@@ -34,6 +35,13 @@ public class AuthController {
         iAuthService.createAccountAdmin(createAdminAccountDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 iResponseService.generateResponse(true, "Confirma tu cuenta en tu correo")
+        );
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody LoginDTO loginDTO) {
+        return ResponseEntity.status(HttpStatus.OK).body(
+                iResponseService.generateResponse(true, iAuthService.login(loginDTO))
         );
     }
 }

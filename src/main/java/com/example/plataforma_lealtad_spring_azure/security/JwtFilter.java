@@ -39,14 +39,14 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         // * Validacion de email en claims
-        if (email != null && idUser != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             Optional<User> user = iUserSevice.getUserByEmail(email);
             if (jwtService.isValidToken(token, user.get())) {
                 var authorities = user.get().getRols().stream()
                         .map(rol -> new SimpleGrantedAuthority(rol.getName_rol()))
                         .toList();
                 UserInfoDetails userInfoDetails = new UserInfoDetails(user.get());
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, userInfoDetails, authorities);
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userInfoDetails, null, authorities);
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }

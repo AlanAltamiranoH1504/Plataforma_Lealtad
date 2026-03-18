@@ -2,13 +2,17 @@ package com.example.plataforma_lealtad_spring_azure.services;
 
 import com.example.plataforma_lealtad_spring_azure.dtos.auth.CreateAdminAccountDTO;
 import com.example.plataforma_lealtad_spring_azure.dtos.auth.CreateCustomerAccountDTO;
+import com.example.plataforma_lealtad_spring_azure.dtos.auth.LoginDTO;
 import com.example.plataforma_lealtad_spring_azure.exceptions.NotFoundEntityException;
+import com.example.plataforma_lealtad_spring_azure.exceptions.UnAuthorizeException;
 import com.example.plataforma_lealtad_spring_azure.exceptions.rol.IncorrectRolException;
 import com.example.plataforma_lealtad_spring_azure.exceptions.user.EmailInUseException;
 import com.example.plataforma_lealtad_spring_azure.models.*;
 import com.example.plataforma_lealtad_spring_azure.repositories.*;
+import com.example.plataforma_lealtad_spring_azure.security.JwtService;
 import com.example.plataforma_lealtad_spring_azure.services.interfaces.IAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -25,6 +29,10 @@ public class AuthService implements IAuthService {
     private IProgramRepository iProgramRepository;
     @Autowired
     private IRolRespitory iRolRespitory;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private JwtService jwtService;
 
     @Override
     public void createAccountCustomer(CreateCustomerAccountDTO createCustomerAccountDTO) {
@@ -40,7 +48,7 @@ public class AuthService implements IAuthService {
         User userToSave = new User(
                 createCustomerAccountDTO.getEmail(),
                 createCustomerAccountDTO.getUsername(),
-                createCustomerAccountDTO.getPassword(),
+                passwordEncoder.encode(createCustomerAccountDTO.getPassword()),
                 1,
                 iProgramRepository.getReferenceById(createCustomerAccountDTO.getProgram()),
                 rolsToAssign
@@ -75,7 +83,7 @@ public class AuthService implements IAuthService {
         User userToSave = new User(
                 createAdminAccountDTO.getEmail(),
                 createAdminAccountDTO.getUsername(),
-                createAdminAccountDTO.getPassword(),
+                passwordEncoder.encode(createAdminAccountDTO.getPassword()),
                 1,
                 iProgramRepository.getReferenceById(createAdminAccountDTO.getProgram()),
                 List.of(iRolRespitory.findById(createAdminAccountDTO.getRol()).get())
@@ -94,6 +102,22 @@ public class AuthService implements IAuthService {
                 userToSave
         );
         iAdminRepository.save(adminToSave);
+    }
+
+    @Override
+    public String login(LoginDTO loginDTO) {
+        // * Search user by email
+        User usertoGetJWT = iUserRepository.getUserByEmail(loginDTO.getEmail());
+        if (usertoGetJWT == null || usertoGetJWT.getStatus() == 0) {
+            throw new NotFoundEntityException("No se ha encontrado un usuario con el email " + loginDTO.getEmail() + " o se encuentra deshabilitado");
+        }
+        String passwordHash = usertoGetJWT.getPassword();
+        if (passwordEncoder.matches(loginDTO.getPassword(), passwordHash)) {
+            String token = jwtService.generateTokenJWT(usertoGetJWT);
+            return token;
+        } else {
+            throw new UnAuthorizeException("Las credenciales no son validas");
+        }
     }
 
     @Override
