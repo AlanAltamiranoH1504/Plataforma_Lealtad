@@ -1,12 +1,14 @@
 package com.example.plataforma_lealtad_spring_azure.exceptions;
 
 import com.example.plataforma_lealtad_spring_azure.exceptions.program.ProgramExistsException;
+import com.example.plataforma_lealtad_spring_azure.exceptions.rol.IncorrectRolException;
 import com.example.plataforma_lealtad_spring_azure.exceptions.rol.RolExistsException;
 import com.example.plataforma_lealtad_spring_azure.exceptions.user.EmailInUseException;
 import com.example.plataforma_lealtad_spring_azure.services.interfaces.IResponseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -52,6 +54,27 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleEmailInUseException(EmailInUseException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(
                 iResponseService.generateResponse(false, ex.getMessage())
+        );
+    }
+
+    @ExceptionHandler(NotFoundEntityException.class)
+    public ResponseEntity<?> handleNotFoundEntityException(NotFoundEntityException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                iResponseService.generateResponse(false, ex.getMessage())
+        );
+    }
+
+    @ExceptionHandler(IncorrectRolException.class)
+    public ResponseEntity<?> handleIncorrectRolException(IncorrectRolException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                iResponseService.generateResponse(false, ex.getMessage())
+        );
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                iResponseService.generateResponse(false, "Es necesario enviar un body de tipo json valido")
         );
     }
 }
